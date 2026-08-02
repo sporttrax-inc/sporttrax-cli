@@ -2,6 +2,15 @@ version: 2
 
 project_name: sporttrax
 
+# Shell completions are generated from the cobra tree, the same source as
+# docs/, so they cannot drift from the commands.
+before:
+  hooks:
+    - mkdir -p completions
+    - sh -c "go run ./cmd/sporttrax completion bash > completions/sporttrax.bash"
+    - sh -c "go run ./cmd/sporttrax completion zsh  > completions/sporttrax.zsh"
+    - sh -c "go run ./cmd/sporttrax completion fish > completions/sporttrax.fish"
+
 builds:
   - main: ./cmd/sporttrax
     binary: sporttrax
@@ -34,6 +43,33 @@ archives:
       - LICENSE
       - THIRD_PARTY_NOTICES.md
       - README.md
+
+homebrew_casks:
+  - name: sporttrax
+    repository:
+      owner: sporttrax-inc
+      name: homebrew-tap
+      # The release job's GITHUB_TOKEN is scoped to this repository only,
+      # so writing the cask to the tap needs a token that can reach it.
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://sporttrax.com
+    description: SportTrax command-line interface
+    license: Apache-2.0
+    binaries:
+      - sporttrax
+    completions:
+      bash: completions/sporttrax.bash
+      zsh: completions/sporttrax.zsh
+      fish: completions/sporttrax.fish
+    # Homebrew quarantines what a cask downloads, and this binary is not
+    # yet signed or notarized, so Gatekeeper would refuse to run it on
+    # first launch. Stripping the attribute is the standard workaround
+    # until a Developer ID signature is in place — at which point this
+    # block should go away rather than linger.
+    hooks:
+      post:
+        install: |
+          system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/sporttrax"]
 
 checksum:
   name_template: checksums.txt

@@ -18,6 +18,13 @@ the binary bundles everything it needs.
 
 ## Install
 
+**Homebrew** (macOS and Linux):
+
+```sh
+brew install sporttrax-inc/tap/sporttrax
+brew upgrade sporttrax
+```
+
 **Download a release.** Pick your platform from the
 [latest release](https://github.com/sporttrax-inc/sporttrax-cli/releases/latest).
 Archives are named `sporttrax_<version>_<os>_<arch>` — `.tar.gz`, or

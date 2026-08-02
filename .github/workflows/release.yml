@@ -44,3 +44,8 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN is scoped to this repository, so publishing the
+          # cask to sporttrax-inc/homebrew-tap needs its own credential.
+          # A fine-grained PAT with Contents: read and write on that
+          # repository is enough.
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
