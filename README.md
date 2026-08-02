@@ -303,6 +303,13 @@ internal/api/       SportTrax API client
 internal/version/   build metadata injected via ldflags
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Two rules are worth knowing before
+you start: every data capability ships on both the CLI and MCP surfaces in
+the same change, and `docs/` and `THIRD_PARTY_NOTICES.md` are generated —
+CI fails on drift in either.
+
 ## Security
 
 To report a security issue, see [SECURITY.md](SECURITY.md). Please do not
