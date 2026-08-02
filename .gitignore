@@ -1,0 +1,11 @@
+/bin/
+/dist/
+*.exe
+.DS_Store
+
+# Never commit local credentials or machine-specific config: the CLI reads
+# real tokens from the user's config dir, and a stray .env here would be
+# public the moment it lands.
+.env
+.env.*
+!.env.example

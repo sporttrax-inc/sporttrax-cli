@@ -1,0 +1,36 @@
+version: "2"
+
+linters:
+  # standard set: errcheck, govet, ineffassign, staticcheck, unused
+  default: standard
+  enable:
+    - gosec
+    - revive
+    - misspell
+  settings:
+    errcheck:
+      # Terminal-write and env errors are unactionable in a CLI; response
+      # body Close in a read path is idiomatically unchecked.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - os.Setenv
+        - (io.ReadCloser).Close
+        - (net/http.ResponseWriter).Write
+    gosec:
+      excludes:
+        - G104 # unhandled errors — errcheck owns this with tuned exclusions
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true # package docs required only where they add context
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec # tests build their own temp paths and stub payloads
+
+formatters:
+  enable:
+    - gofumpt

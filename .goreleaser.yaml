@@ -1,0 +1,51 @@
+version: 2
+
+project_name: sporttrax
+
+builds:
+  - main: ./cmd/sporttrax
+    binary: sporttrax
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/sporttrax-inc/sporttrax-cli/internal/version.Version={{.Version}}
+      - -X github.com/sporttrax-inc/sporttrax-cli/internal/version.Commit={{.ShortCommit}}
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    # The binary is statically linked, so the MIT/BSD notices of everything
+    # compiled into it have to travel with it.
+    files:
+      - LICENSE
+      - THIRD_PARTY_NOTICES.md
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: sporttrax-inc
+    name: sporttrax-cli

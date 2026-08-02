@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          [ -z "$unformatted" ] || { echo "gofmt needed: $unformatted"; exit 1; }
+
+      - name: Vet
+        run: go vet ./...
+
+      # v9 is the major that installs golangci-lint v2, which .golangci.yml
+      # declares. The version is pinned rather than floating: golangci-lint
+      # refuses to run when the Go it was built with is older than the Go
+      # version go.mod targets, so the linter has to keep pace with the
+      # toolchain deliberately, not by luck.
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.12.2
+
+      - name: Test
+        run: go test ./...
+
+      - name: Tidy
+        run: go mod tidy -diff
+
+      - name: Docs drift
+        run: |
+          make docs
+          git diff --exit-code -- docs
+
+      # A dependency change that skips `make notices` would ship binaries
+      # without the attributions their licenses require.
+      - name: Third-party notices drift
+        run: |
+          make notices
+          git diff --exit-code -- THIRD_PARTY_NOTICES.md
+
+  # Dependency scanning lives here rather than in the pre-commit hook: it
+  # needs the network and the vulnerability database moves independently of
+  # the code, so a clean commit today can become a vulnerable one tomorrow.
+  vulnerabilities:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # govulncheck is run directly rather than through
+      # golang/govulncheck-action: that action defaults go-version-input to
+      # "stable", which silently wins over go-version-file, so the scan ran
+      # on a different toolchain than the one go.mod targets. Whether a
+      # stdlib vulnerability applies depends on the Go version, so the scan
+      # has to use ours.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Vulnerability scan
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
