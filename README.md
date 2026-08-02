@@ -25,6 +25,19 @@ brew install sporttrax-inc/tap/sporttrax
 brew upgrade sporttrax
 ```
 
+**Install script** (macOS and Linux) — downloads the latest release and
+verifies its checksum before installing:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/sporttrax-inc/sporttrax-cli/main/install.sh | sh
+```
+
+It installs to `/usr/local/bin` when that is writable and `~/.local/bin`
+otherwise, telling you if that directory is not on your `PATH`. Set
+`SPORTTRAX_INSTALL_DIR` to choose, or `SPORTTRAX_VERSION` to pin a
+release. Reading [install.sh](install.sh) before piping it to a shell is
+a reasonable habit.
+
 **Download a release.** Pick your platform from the
 [latest release](https://github.com/sporttrax-inc/sporttrax-cli/releases/latest).
 Archives are named `sporttrax_<version>_<os>_<arch>` — `.tar.gz`, or

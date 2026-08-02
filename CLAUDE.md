@@ -153,12 +153,16 @@ human tool. Consequences:
 Everything above describes the CLI as it is. These are settled decisions
 awaiting work; treat a reference to one as a plan, not a feature.
 
-- **Distribution beyond GitHub Releases.** Releases are built by
-  goreleaser from a `v*` tag (.github/workflows/release.yml) and are the
-  only channel that exists. A Homebrew tap
-  (`sporttrax-inc/homebrew-tap`, needs a `homebrew_casks` block) and a
-  curl installer script are planned; no Scoop/deb/rpm for now. `go
-  install` works today by virtue of the repo being public.
+- **Windows package managers.** winget and Scoop are planned; no deb/rpm
+  for now. macOS and Linux are covered by the Homebrew tap, install.sh,
+  and `go install`, but Windows users have only the .zip from the
+  releases page — which matters more than it looks, since timing consoles
+  run Windows.
+- **Code signing.** Nothing is signed or notarized. On macOS the cask
+  works around Gatekeeper by stripping the quarantine attribute in a
+  postflight hook — delete that once a Developer ID signature exists,
+  rather than leaving it. On Windows, SmartScreen will warn until an
+  Authenticode signature builds reputation.
 - **Update notification: notify-only** — gh-style check of the releases
   feed, cached ≤1/24h, skipped when non-TTY/CI; prints an upgrade hint.
   No self-update command. Nothing is implemented; there is no version
