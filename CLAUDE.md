@@ -145,15 +145,29 @@ human tool. Consequences:
 - **Pagination: gh-style `--limit N`** — default ~30 items, larger limits
   transparently follow cursors, `--limit all` depletes with a rate-limit
   warning (non-admins: 15 req/min, 1000/day). No raw cursor flags.
-- **Distribution: GitHub Releases + Homebrew tap + curl installer script.**
-  No Scoop/deb/rpm for now.
-- **Updates: notify-only** — gh-style check of the releases feed, cached
-  ≤1/24h, skipped when non-TTY/CI; prints upgrade hint. No self-update
-  command.
 - **JSON: plain `--json` only.** No --jq/--template/field selection unless
   demanded later; users pipe to jq.
-- **Milestone 1: `meet` commands only** (list/view) as the thin vertical
-  slice proving client + pagination + output; other resources follow.
+
+## Not built yet (decided, unimplemented — do not describe as shipped)
+
+Everything above describes the CLI as it is. These are settled decisions
+awaiting work; treat a reference to one as a plan, not a feature.
+
+- **Distribution beyond GitHub Releases.** Releases are built by
+  goreleaser from a `v*` tag (.github/workflows/release.yml) and are the
+  only channel that exists. A Homebrew tap
+  (`sporttrax-inc/homebrew-tap`, needs a `homebrew_casks` block) and a
+  curl installer script are planned; no Scoop/deb/rpm for now. `go
+  install` works today by virtue of the repo being public.
+- **Update notification: notify-only** — gh-style check of the releases
+  feed, cached ≤1/24h, skipped when non-TTY/CI; prints an upgrade hint.
+  No self-update command. Nothing is implemented; there is no version
+  check in the binary at all.
+- **Streaming.** `meet watch` emitting NDJSON under `--json`. Pusher
+  connection details are already carried per environment for it, but no
+  streaming code exists — and the server's broadcast channels are private
+  and session-authorized, so a public-API token cannot subscribe to them
+  yet. That is a server-side prerequisite, not a CLI task.
 
 ## Development
 

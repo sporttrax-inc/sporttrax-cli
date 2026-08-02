@@ -287,11 +287,22 @@ make cross          # build all six platform binaries into dist/
 
 ## Releasing
 
-Releases are built with [goreleaser](https://goreleaser.com):
+Pushing a `v*` tag runs [.github/workflows/release.yml](.github/workflows/release.yml),
+which tests, scans for vulnerabilities, and publishes the archives with
+[goreleaser](https://goreleaser.com):
 
 ```sh
-goreleaser release --snapshot --clean   # local dry run, artifacts in dist/
-goreleaser release --clean              # tagged release (requires a git tag + GITHUB_TOKEN)
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+Releasing from CI rather than a laptop is deliberate — the binaries are
+built on the Go toolchain `go.mod` resolves to, so a locally installed
+version can't quietly become the one you ship.
+
+For a local dry run, artifacts land in `dist/` and nothing is published:
+
+```sh
+goreleaser release --snapshot --clean
 ```
 
 ## Layout

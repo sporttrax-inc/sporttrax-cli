@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      # Creating the GitHub release and uploading the archives.
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # goreleaser derives the changelog from the commit range since
+          # the previous tag.
+          fetch-depth: 0
+
+      # Releasing from CI rather than a laptop is the point of this
+      # workflow: the binaries are built on the toolchain go.mod resolves
+      # to, not whatever happens to be installed on someone's machine.
+      # go1.26.4 shipped GO-2026-5856 in crypto/tls, reachable from every
+      # request this client makes — a release cut on that toolchain would
+      # have carried it.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Test
+        run: go test ./...
+
+      # Gate the release on a clean scan of the toolchain being shipped,
+      # not just of main at some earlier point in time.
+      - name: Vulnerability scan
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
