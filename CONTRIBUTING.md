@@ -62,6 +62,12 @@ make notices   # after any dependency change
 Command help text (`Short`, `Long`, `Example`) is the documentation source
 of truth — `docs/` is produced from it.
 
+**Dependabot PRs that bump Go modules will fail this check**, because the
+bot cannot run `make notices`. That is the check working: the binary is
+statically linked, so a dependency change alters which licenses ship with
+it. Run `make notices` on the PR branch and push the result. Updates are
+grouped weekly so this is one regeneration, not one per module.
+
 ## Conventions
 
 The full set lives in [CLAUDE.md](CLAUDE.md). The ones that come up most:

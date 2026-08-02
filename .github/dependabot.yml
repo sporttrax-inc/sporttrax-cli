@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  # CI sat broken for five runs because golangci-lint-action@v6 quietly
+  # stopped matching the config, and nothing was watching the actions.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # One PR a week rather than one per action.
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
+
+  # Grouping matters more than usual here: every dependency change makes
+  # THIRD_PARTY_NOTICES.md stale, and CI fails on that drift by design.
+  # Ungrouped, each bump would be a separate PR needing its own `make
+  # notices`; grouped, it is one regeneration a week.
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      go-dependencies:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    # Majors arrive on their own, since they tend to need real work.
+    open-pull-requests-limit: 5
