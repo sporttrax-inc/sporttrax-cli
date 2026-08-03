@@ -69,6 +69,21 @@ at `bin/sporttrax`.
 Confirm it worked with `sporttrax version` (or `sporttrax --version` —
 both print the same line).
 
+### If your operating system warns you
+
+Releases are not yet code-signed. Homebrew, the install script, and `go
+install` are unaffected — none of them mark the binary as
+browser-downloaded. Downloading an archive **through a browser** does mark
+it, and then:
+
+- **macOS** refuses to run it, saying it cannot check the developer.
+  Approve it in **System Settings → Privacy & Security**, or strip the
+  mark yourself: `xattr -d com.apple.quarantine ./sporttrax`
+- **Windows** may show a SmartScreen warning; **More info → Run anyway**.
+
+Every release publishes a `checksums.txt`, so you can confirm you have the
+bytes we built regardless of what your operating system says about them.
+
 ## Quickstart
 
 ```sh
