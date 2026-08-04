@@ -43,6 +43,10 @@ archives:
       - LICENSE
       - THIRD_PARTY_NOTICES.md
       - README.md
+      # The cask symlinks these out of the archive, so they have to be in it —
+      # declaring them under homebrew_casks.completions only writes the
+      # *_completion stanzas, it does not package the files.
+      - completions/*
 
 homebrew_casks:
   - name: sporttrax
