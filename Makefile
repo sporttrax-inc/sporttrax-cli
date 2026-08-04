@@ -5,7 +5,7 @@ LDFLAGS := -s -w \
 	-X github.com/sporttrax-inc/sporttrax-cli/internal/version.Version=$(VERSION) \
 	-X github.com/sporttrax-inc/sporttrax-cli/internal/version.Commit=$(COMMIT)
 
-.PHONY: build test lint vuln cross docs notices setup clean
+.PHONY: build test lint vuln cross docs notices package-check setup clean
 
 # One-time dev setup: activate the committed git hooks and check tooling.
 setup:
@@ -46,6 +46,17 @@ cross:
 	GOOS=linux   GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-linux-arm64 ./cmd/sporttrax
 	GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-windows-amd64.exe ./cmd/sporttrax
 	GOOS=windows GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o dist/$(BINARY)-windows-arm64.exe ./cmd/sporttrax
+
+# Build the release archives and verify the Homebrew cask's symlink sources
+# are packaged. Without this, goreleaser first runs during the release that
+# publishes the artifacts, so a packaging mistake is only discovered by users
+# running `brew install`. Requires goreleaser; overwrites dist/ (--clean), so
+# it clobbers `make cross` output. The token is never used — snapshot mode
+# skips publishing — but the cask's repository field is a template goreleaser
+# still resolves.
+package-check:
+	HOMEBREW_TAP_TOKEN=unused-in-snapshot goreleaser release --snapshot --clean
+	./scripts/check-cask-sources.sh
 
 clean:
 	rm -rf bin dist

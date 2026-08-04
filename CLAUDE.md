@@ -191,6 +191,13 @@ awaiting work; treat a reference to one as a plan, not a feature.
 - docs/ is generated from the cobra definitions (`make docs`) — command
   help text (Short/Long/Example) is the documentation source of truth;
   never edit docs/ by hand, regenerate after any command change
+- `make package-check` (needs `brew install goreleaser`) builds the release
+  archives and asserts every path the generated cask symlinks (binary,
+  completions) exists inside each tarball; CI runs it on every push and PR.
+  Declaring a completion under `homebrew_casks` does **not** package it —
+  it only writes the cask stanza — and a cask symlinking a file the archive
+  lacks fails at `brew install` time, after the artifacts are public. Note
+  it overwrites dist/, so it clobbers `make cross` output
 - THIRD_PARTY_NOTICES.md is generated from the linked module graph
   (`make notices`) — the binary is statically linked, so the MIT/BSD
   notices of everything compiled into it must ship with it. Any

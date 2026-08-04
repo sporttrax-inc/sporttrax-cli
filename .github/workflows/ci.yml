@@ -55,6 +55,19 @@ jobs:
           make notices
           git diff --exit-code -- THIRD_PARTY_NOTICES.md
 
+      # Nothing else assembles the release archives, so without this
+      # goreleaser first runs during the release that publishes them — and a
+      # cask that symlinks a file the archive does not contain fails only at
+      # `brew install` time, after the artifacts are public. Runs in this job
+      # rather than its own to reuse the checkout and toolchain set up above.
+      - name: Install goreleaser
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          install-only: true
+
+      - name: Release packaging
+        run: make package-check
+
   # Dependency scanning lives here rather than in the pre-commit hook: it
   # needs the network and the vulnerability database moves independently of
   # the code, so a clean commit today can become a vulnerable one tomorrow.
